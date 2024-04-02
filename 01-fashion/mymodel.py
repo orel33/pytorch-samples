@@ -24,6 +24,7 @@ class NeuralNetwork(nn.Module):
     def forward(self, x):
         x = self.flatten(x)
         logits = self.linear_relu_stack(x)
+        # probas = nn.Softmax(dim=1)(logits)
         return logits  # output shape [N, 10]
 
 # Logits interpreted to be the unnormalised (or not-yet normalised) predictions
@@ -39,6 +40,7 @@ class NeuralNetwork(nn.Module):
 
 def train(dataloader, model, loss_fn, optimizer, device):
     size = len(dataloader.dataset)
+    nb_batches = len(dataloader)
     model.train()
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
@@ -53,8 +55,8 @@ def train(dataloader, model, loss_fn, optimizer, device):
         optimizer.zero_grad()
 
         if batch % 100 == 0:
-            loss, current = loss.item(), (batch + 1) * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            loss = loss.item()
+            print(f"loss: {loss:>7f}  [{batch:>5d}/{nb_batches:>5d}]")
 
 # test the model
 

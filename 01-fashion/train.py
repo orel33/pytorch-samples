@@ -74,7 +74,8 @@ print(model)
 
 # training the model
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+# optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 # size = len(train_dataloader.dataset)
 model.train()
 # get first batch of shape X=[N, C, H, W], y=[N]
@@ -99,7 +100,7 @@ print(f"Loss: {loss}")
 ######################################################################
 
 
-epochs = 5
+epochs = 10
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     mymodel.train(train_dataloader, model, loss_fn, optimizer, device)
