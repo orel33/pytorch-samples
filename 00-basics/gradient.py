@@ -1,6 +1,7 @@
 # https://gricad-gitlab.univ-grenoble-alpes.fr/talks/fidle/-/blob/master/Misc/
 
 import torch
+import torch.nn.functional as F
 
 # ---- My basic function f
 
@@ -57,7 +58,9 @@ print("dz/du=u.grad:", u.grad)  # dz/du = x
 x = torch.tensor([[2.0, 3.0], [4.0, 5.0]], requires_grad=True)
 print("x:", x)
 y = x * x
-loss = y.sum()  # convert tensor result into a scalar loss
+zero = torch.zeros(2, 2)
+loss = F.mse_loss(y, zero)
+# loss = y.sum()  # convert tensor result into a scalar loss
 print("y:", y)
 print("loss:", loss)
 # grads = torch.tensor([[1.0, 1.0], [1.0, 1.0]])
