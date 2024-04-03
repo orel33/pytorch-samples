@@ -77,6 +77,7 @@ with torch.no_grad():
 
 
 # plot the first image
+
 # https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
 # img = X[0].squeeze()  # remove the input dimension of size 1
 # plt.imshow(img, cmap='gray')
