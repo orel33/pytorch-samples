@@ -17,6 +17,7 @@ from torch.utils.data import DataLoader
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+# Nota Bene: ToTensor() will scale your data to [0, 1].
 
 # get and format the training set
 training_data = torchvision.datasets.MNIST(
@@ -34,7 +35,9 @@ test_data = torchvision.datasets.MNIST(
     transform=ToTensor()
 )
 
-# Model definition
+######################################################################
+#                             MODEL                                  #
+######################################################################
 
 
 class MyModel(nn.Module):
@@ -62,6 +65,10 @@ class MyModel(nn.Module):
         return x
 
 
+######################################################################
+#                             TRAIN                                  #
+######################################################################
+
 def train(model, dataloader, epochs):
 
     count = 0
@@ -86,7 +93,7 @@ def train(model, dataloader, epochs):
 
 
 ######################################################################
-#                             TRAIN                                  #
+#                              MAIN                                  #
 ######################################################################
 
 EPOCHS = 5
