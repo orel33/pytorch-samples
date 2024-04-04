@@ -32,8 +32,9 @@ print('df(3) is : ', df(3))
 x = torch.tensor(3.0, requires_grad=True)
 print("x:", x)
 y = x*x + 4*x - 5
-print("y.grad_fn:", y.grad_fn)
 print("y:", y)
+print("y.grad_fn:", y.grad_fn)
+print("y.data:", y.data)
 # compute the gradient of y with respect to x (dy/dx)
 y.backward()
 print("dy/dx=x.grad:", x.grad)
@@ -55,14 +56,20 @@ z.backward()  # compute the gradient of z with respect to x and u
 print("dz/dx=x.grad:", x.grad)  # dz/dx = 2*x + 2 + u
 print("dz/du=u.grad:", u.grad)  # dz/du = x
 
+# ---- Tensor and gradient
+
 # z.backward() is equivalent to z.backward(torch.tensor(1.0))
 # z.backward(torch.tensor(1.0))
-
-# ---- Tensor and gradient
 
 # When dealing with non-scalar tensors, backward requires an additional
 # argument: the gradient of the tensor with respect to some scalar (usually a
 # loss).
+
+# By default, this gradient is a tensor with ones at the same shape as the
+# tensor. But if you chain some layers manually, you can provide a custom
+# gradient to the backward method.
+
+# ---- Tensor and gradient
 
 x = torch.tensor([[2.0, 3.0], [4.0, 5.0]], requires_grad=True)
 print("x:", x)
