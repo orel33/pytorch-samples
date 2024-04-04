@@ -102,6 +102,7 @@ fit(model, train_dataloader, EPOCHS)
 NTESTS = 1000
 test_dataloader = DataLoader(test_data, batch_size=NTESTS, shuffle=True)
 X_test, y_test = next(iter(test_dataloader))  # get the first batch
+model.eval()
 y_test_pred = model(X_test)
 loss = nn.CrossEntropyLoss()
 curr_loss = loss(y_test_pred, y_test)
