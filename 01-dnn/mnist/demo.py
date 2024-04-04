@@ -62,7 +62,7 @@ class MyModel(nn.Module):
         return x
 
 
-def fit(model, dataloader, epochs):
+def train(model, dataloader, epochs):
 
     count = 0
     loss = nn.CrossEntropyLoss()
@@ -70,7 +70,7 @@ def fit(model, dataloader, epochs):
     model.train()
 
     for epoch in range(epochs):
-        for batch, (X, y) in enumerate(dataloader):
+        for X, y in dataloader:
             X, y = X.to(DEVICE), y.to(DEVICE)
             # X: 512x1x28x28 (float32) -> images
             # y: 512 (int64) -> classes
@@ -95,11 +95,12 @@ model = MyModel().to(DEVICE)
 train_dataloader = DataLoader(training_data, batch_size=BATCH_SIZE)
 
 # first image and label in the training dataset
-# X0, y0 = train_dataloader.dataset[0]
-# print(f"X0: {X0.shape} (dtype: {X0.dtype})")
-# print(f"y0: {y0}")
+X0, y0 = train_dataloader.dataset[0]
+print(f"X0: {X0.shape} (dtype: {X0.dtype})")
+print(f"y0: {y0}")
 
-fit(model, train_dataloader, EPOCHS)
+print(f"Training on {DEVICE}")
+train(model, train_dataloader, EPOCHS)
 
 ######################################################################
 #                              TEST                                  #
@@ -107,6 +108,7 @@ fit(model, train_dataloader, EPOCHS)
 
 # test the model on 1000 random images
 NTESTS = 1000
+print(f"Testing the model on {NTESTS} images")
 test_dataloader = DataLoader(test_data, batch_size=NTESTS, shuffle=True)
 X_test, y_test = next(iter(test_dataloader))  # get the first batch
 model.eval()
