@@ -7,6 +7,11 @@ import numpy as np
 data = [[1, 2], [3, 4]]
 x_data = torch.tensor(data)
 
+# what is the difference between a tensor x and x.data?
+
+print(f"Tensor: {x_data}\n")
+print(f"Tensor Data: {x_data.data}\n")
+
 # initialize a tensor from a numpy array
 np_array = np.array(data)
 x_np = torch.from_numpy(np_array)

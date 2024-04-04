@@ -1,4 +1,5 @@
-# https://gricad-gitlab.univ-grenoble-alpes.fr/talks/fidle/-/blob/master/Misc/
+# => https://gricad-gitlab.univ-grenoble-alpes.fr/talks/fidle/-/blob/master/Misc/
+# => https://pytorch.org/docs/stable/generated/torch.autograd.backward.html#torch.autograd.backward
 
 import torch
 import torch.nn.functional as F
@@ -41,13 +42,21 @@ print("dy/dx=x.grad:", x.grad)
 # whenever .backward() is called.
 
 # ---- Another example
-x.grad.zero_()  # reset the gradient
+# x.grad.zero_()  # reset the gradient
+x = torch.tensor(3.0, requires_grad=True)
 u = torch.tensor(1.0, requires_grad=True)
 z = x*x + 2*x + x*u + 1
 print("z:", z)
+# retain_graph=True to be able to call backward again, else the computational graph is deleted...
+# z.backward(retain_graph=True)
+# print("dz/dx=x.grad:", x.grad)  # dz/dx = 2*x + 2 + u
+# print("dz/du=u.grad:", u.grad)  # dz/du = x
 z.backward()  # compute the gradient of z with respect to x and u
 print("dz/dx=x.grad:", x.grad)  # dz/dx = 2*x + 2 + u
 print("dz/du=u.grad:", u.grad)  # dz/du = x
+
+# z.backward() is equivalent to z.backward(torch.tensor(1.0))
+# z.backward(torch.tensor(1.0))
 
 # ---- Tensor and gradient
 
@@ -59,12 +68,11 @@ x = torch.tensor([[2.0, 3.0], [4.0, 5.0]], requires_grad=True)
 print("x:", x)
 y = x * x
 zero = torch.zeros(2, 2)
+# convert tensor result into a scalar loss
 loss = F.mse_loss(y, zero)
-# loss = y.sum()  # convert tensor result into a scalar loss
+# loss = y.sum()
 print("y:", y)
 print("loss:", loss)
-# grads = torch.tensor([[1.0, 1.0], [1.0, 1.0]])
-# y.backward(grads)  # what is this grads in backward() ?
 loss.backward()
 print("x.grad:", x.grad)
 
@@ -93,6 +101,7 @@ for i in range(100):
     if i % 10 == 0:
         print("i:", i, "x:", x.item())
 
+# It converges to the minimum of the function f(), that is x = -2.
 
 # After running the gradient descent algorithm for 100 iterations, we can see
 # that the value of x converges to the minimum of the loss function.
