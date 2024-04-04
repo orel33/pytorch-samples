@@ -10,41 +10,30 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 import torchvision  # to get the MNIST dataset
+from torchvision.transforms import ToTensor
 import numpy as np
-import matplotlib.pyplot as plt
-import sys
-import os
+from torch.utils.data import DataLoader
 
 # get and format the training set
-mnist_trainset = torchvision.datasets.MNIST(
-    root='./data', train=True, download=True, transform=None)
-x_train = mnist_trainset.data.type(torch.DoubleTensor)  # 60000x28x28
-y_train = mnist_trainset.targets  # 60000
-
-print('x_train.shape =', x_train.shape)
-print('y_train.shape =', y_train.shape)
+training_data = torchvision.datasets.MNIST(
+    root='./data',
+    train=True,
+    download=True,
+    transform=ToTensor()
+)
 
 # get and format the test set
-mnist_testset = torchvision.datasets.MNIST(
-    root='./data', train=False, download=True, transform=None)
-x_test = mnist_testset.data.type(torch.DoubleTensor)  # 10000x28x28
-y_test = mnist_testset.targets  # 10000
-
-# Normalize the data
-print('Before normalization : Min={}, max={}'.format(
-    x_train.min(), x_train.max()))
-
-xmax = x_train.max()
-x_train = x_train / xmax
-x_test = x_test / xmax
-
-print('After normalization  : Min={}, max={}'.format(
-    x_train.min(), x_train.max()))
-
+test_data = torchvision.datasets.MNIST(
+    root='./data',
+    train=False,
+    download=True,
+    transform=ToTensor()
+)
 
 # Model definition
+
+
 class MyModel(nn.Module):
     """
     Basic fully connected neural-network
@@ -70,80 +59,57 @@ class MyModel(nn.Module):
         return x
 
 
-def fit(model, X_train, Y_train, X_test, Y_test, EPOCHS=5, BATCH_SIZE=32):
+def fit(model, dataloader, epochs):
 
     loss = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(
-        model.parameters(), lr=1e-3)  # lr is the learning rate
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     model.train()
 
-    # history = convergence_history_CrossEntropyLoss()
-    # history.update(model, X_train, Y_train, X_test, Y_test)
-
-    n = X_train.shape[0]  # number of observations in the training data
-
-    # stochastic gradient descent
-    for epoch in range(EPOCHS):
-
-        print('Epoch', epoch+1, '/', EPOCHS)
-
-        batch_start = 0
-        epoch_shuffler = np.arange(n)
-        # remark that 'utilsData.DataLoader' could be used instead
-        np.random.shuffle(epoch_shuffler)
-
-        while batch_start+BATCH_SIZE < n:
-            # get mini-batch observation
-            mini_batch_observations = epoch_shuffler[batch_start:batch_start+BATCH_SIZE]
-            # the input image is flattened
-            var_X_batch = Variable(
-                X_train[mini_batch_observations, :, :]).float()
-            var_Y_batch = Variable(Y_train[mini_batch_observations])
-
-            # gradient descent step
-            optimizer.zero_grad()  # set the parameters gradients to 0
-            # predict y with the current NN parameters
-            Y_pred_batch = model(var_X_batch)
-
-            # compute the current loss
-            curr_loss = loss(Y_pred_batch, var_Y_batch)
-            curr_loss.backward()  # compute the loss gradient w.r.t. all NN parameters
-            optimizer.step()  # update the NN parameters
-
-            # prepare the next mini-batch of the epoch
-            batch_start += BATCH_SIZE
-
-    #     history.update(model, X_train, Y_train, X_test, Y_test)
-
-    # return history
+    for epoch in range(epochs):
+        for batch, (X, y) in enumerate(dataloader):
+            optimizer.zero_grad()
+            y_pred = model(X)
+            # X: 512x1x28x28 (float32)
+            # y_pred_proba: 512x10 (float32)
+            # y: 512 (int64)
+            # y_pred_class = torch.argmax(y_pred, dim=1)
+            curr_loss = loss(y_pred, y)
+            curr_loss.backward()
+            optimizer.step()
+        print('epoch = ', epoch, 'loss =', curr_loss.item())
 
 
 ######################################################################
-#                             MAIN                                   #
+#                             TRAIN                                  #
 ######################################################################
 
+EPOCHS = 5
+BATCH_SIZE = 512
 model = MyModel()
+train_dataloader = DataLoader(training_data, batch_size=BATCH_SIZE)
 
+# first image and label in the training dataset
+# X0, y0 = train_dataloader.dataset[0]
+# print(f"X0: {X0.shape} (dtype: {X0.dtype})")
+# print(f"y0: {y0}")
 
-batch_size = 512
-epochs = 128
+fit(model, train_dataloader, EPOCHS)
 
-fit(model, x_train, y_train, x_test, y_test,
-    EPOCHS=epochs, BATCH_SIZE=batch_size)
+######################################################################
+#                              TEST                                  #
+######################################################################
 
-
-var_x_test = Variable(x_test[:, :, :]).float()
-var_y_test = Variable(y_test[:])
-y_pred = model(var_x_test)
-
+# test the model on 1000 random images
+NTESTS = 1000
+test_dataloader = DataLoader(test_data, batch_size=NTESTS, shuffle=True)
+X_test, y_test = next(iter(test_dataloader))  # get the first batch
+y_test_pred = model(X_test)
 loss = nn.CrossEntropyLoss()
-curr_loss = loss(y_pred, var_y_test)
+curr_loss = loss(y_test_pred, y_test)
+y_test_pred_class = torch.argmax(y_test_pred, dim=1)
+accuracy = (y_test_pred_class == y_test).float().mean()
 
-val_loss = curr_loss.item()
-val_accuracy = float(
-    (torch.argmax(y_pred, dim=1) == var_y_test).float().mean())
-
-print('Test loss     :', val_loss)
-print('Test accuracy :', val_accuracy)
+print('Test loss     :', curr_loss.item())
+print('Test accuracy :', accuracy.item())
 
 # EOF
