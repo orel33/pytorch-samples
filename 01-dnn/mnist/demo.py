@@ -15,6 +15,9 @@ from torchvision.transforms import ToTensor
 import numpy as np
 from torch.utils.data import DataLoader
 
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
 # get and format the training set
 training_data = torchvision.datasets.MNIST(
     root='./data',
@@ -68,6 +71,7 @@ def fit(model, dataloader, epochs):
 
     for epoch in range(epochs):
         for batch, (X, y) in enumerate(dataloader):
+            X, y = X.to(DEVICE), y.to(DEVICE)
             # X: 512x1x28x28 (float32) -> images
             # y: 512 (int64) -> classes
             optimizer.zero_grad()
@@ -77,16 +81,17 @@ def fit(model, dataloader, epochs):
             curr_loss = loss(y_pred, y)
             curr_loss.backward()
             optimizer.step()
-        print('epoch = ', epoch, 'loss =', curr_loss.item())
+        print(f'epoch: {epoch+1} / {epochs}, loss: {curr_loss.item()}')
     print('count:', count)
 
 
 ######################################################################
 #                             TRAIN                                  #
 ######################################################################
+
 EPOCHS = 5
 BATCH_SIZE = 512
-model = MyModel()
+model = MyModel().to(DEVICE)
 train_dataloader = DataLoader(training_data, batch_size=BATCH_SIZE)
 
 # first image and label in the training dataset
