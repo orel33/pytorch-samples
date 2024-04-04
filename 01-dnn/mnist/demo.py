@@ -67,12 +67,11 @@ def fit(model, dataloader, epochs):
 
     for epoch in range(epochs):
         for batch, (X, y) in enumerate(dataloader):
+            # X: 512x1x28x28 (float32) -> images
+            # y: 512 (int64) -> classes
             optimizer.zero_grad()
             y_pred = model(X)
-            # X: 512x1x28x28 (float32)
-            # y_pred_proba: 512x10 (float32)
-            # y: 512 (int64)
-            # y_pred_class = torch.argmax(y_pred, dim=1)
+            # y_pred: 512x10 (float32) -> probabilities for each class
             curr_loss = loss(y_pred, y)
             curr_loss.backward()
             optimizer.step()
