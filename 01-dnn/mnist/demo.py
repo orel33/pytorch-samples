@@ -61,6 +61,7 @@ class MyModel(nn.Module):
 
 def fit(model, dataloader, epochs):
 
+    count = 0
     loss = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     model.train()
@@ -72,16 +73,17 @@ def fit(model, dataloader, epochs):
             optimizer.zero_grad()
             y_pred = model(X)
             # y_pred: 512x10 (float32) -> probabilities for each class
+            count += len(y_pred)    # count the number of images processed
             curr_loss = loss(y_pred, y)
             curr_loss.backward()
             optimizer.step()
         print('epoch = ', epoch, 'loss =', curr_loss.item())
+    print('count:', count)
 
 
 ######################################################################
 #                             TRAIN                                  #
 ######################################################################
-
 EPOCHS = 5
 BATCH_SIZE = 512
 model = MyModel()
