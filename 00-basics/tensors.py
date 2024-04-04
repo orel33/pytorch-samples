@@ -34,10 +34,19 @@ print(f"Random Tensor Like: \n {rand_tensor_like} \n")
 # Tensor attributes describe their shape, datatype, and the device on which they
 # are stored.
 
-tensor = torch.rand(3, 4)
+# tensor = torch.randint(0, 10, (3, 4))   # integer random values in [0, 10)
+tensor = torch.rand(3, 4)  # float random values in [0, 1]
 print(f"Shape of tensor: {tensor.shape}")
 print(f"Datatype of tensor: {tensor.dtype}")
 print(f"Device tensor is stored on: {tensor.device}")
+
+# Tensor converting to another datatype
+
+tc = torch.rand(3, 4)*10
+tc = tc.int()  # convert: .float() .double() .int() .long()
+print(f"Datatype of tc: {tc.dtype}")
+print(tc)
+
 
 # Operations on Tensors: <https://pytorch.org/docs/stable/torch.html>
 
