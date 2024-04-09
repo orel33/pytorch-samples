@@ -130,6 +130,9 @@ loss_func = nn.CrossEntropyLoss()
 optimizer = optim.Adam(cnn.parameters(), lr=0.01)
 num_epochs = 10
 train(num_epochs, cnn, train_loader)
-cnn.save('model.pth')
+
+# Save the model to disk
+torch.save(cnn.state_dict(), "mymodel.pth")
+print("Saved PyTorch Model State to mymodel.pth")
 
 ################################################
