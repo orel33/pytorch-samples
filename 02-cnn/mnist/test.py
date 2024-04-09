@@ -4,9 +4,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-# from torchvision import datasets, transforms
 from torchvision.transforms import ToTensor
 from torchvision import datasets
+import model
 
 
 # Device configuration
@@ -30,6 +30,15 @@ test_loader = torch.utils.data.DataLoader(test_data,
                                           batch_size=100,
                                           shuffle=True,
                                           num_workers=1)
+
+################################################
+# Loading the model
+################################################
+
+cnn = model.CNN().to(device)
+cnn.load_state_dict(torch.load("mymodel.pth"))
+print(cnn)
+
 
 ################################################
 # Testing the model
