@@ -24,30 +24,17 @@ train_data = datasets.MNIST(
     transform=ToTensor(),
     download=True,
 )
-test_data = datasets.MNIST(
-    root='data',
-    train=False,
-    transform=ToTensor()
-)
 
 print(train_data)
-print(test_data)
 print(train_data.data.size())
 print(train_data.targets.size())
 
 ################################################
 
-loaders = {
-    'train': torch.utils.data.DataLoader(train_data,
-                                         batch_size=100,
-                                         shuffle=True,
-                                         num_workers=1),
-
-    'test': torch.utils.data.DataLoader(test_data,
-                                        batch_size=100,
-                                        shuffle=True,
-                                        num_workers=1),
-}
+train_loader = torch.utils.data.DataLoader(train_data,
+                                           batch_size=100,
+                                           shuffle=True,
+                                           num_workers=1)
 
 ################################################
 # Displaying images
@@ -105,75 +92,44 @@ class CNN(nn.Module):
         # flatten the output of conv2 to (batch_size, 32 * 7 * 7)
         x = x.view(x.size(0), -1)
         output = self.out(x)
-        return output, x    # return x for visualization
+        return output
 
 
 ################################################
 # Training the model
 ################################################
 
-cnn = CNN().to(device)
-print(cnn)
-loss_func = nn.CrossEntropyLoss()
-optimizer = optim.Adam(cnn.parameters(), lr=0.01)
-
-num_epochs = 10
-
-
-def train(num_epochs, cnn, loaders):
+def train(num_epochs, cnn, loader):
 
     cnn.train()
-
-    # Train the model
-    total_step = len(loaders['train'])
+    total_step = len(loader)
 
     for epoch in range(num_epochs):
-        for i, (images, labels) in enumerate(loaders['train']):
-
+        for i, (images, labels) in enumerate(loader):
             # gives batch data, normalize x when iterate train_loader
             b_x = images   # batch x
             b_y = labels   # batch y
-            output = cnn(b_x)[0]
+            output = cnn(b_x)
             loss = loss_func(output, b_y)
-
-            # clear gradients for this training step
-            optimizer.zero_grad()
-
-            # backpropagation, compute gradients
-            loss.backward()
-            # apply gradients
-            optimizer.step()
+            optimizer.zero_grad()   # clear gradients
+            loss.backward()         # backpropagation, compute gradients
+            optimizer.step()        # apply gradients
 
             if (i+1) % 100 == 0:
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
                       .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
 
 ################################################
-# Testing the model
-################################################
-
-
-def test():
-    # Test the model
-    cnn.eval()
-    with torch.no_grad():
-        correct = 0
-        total = 0
-        for images, labels in loaders['test']:
-            test_output, last_layer = cnn(images)
-            pred_y = torch.max(test_output, 1)[1].data.squeeze()
-            accuracy = (pred_y == labels).sum().item() / float(labels.size(0))
-
-    print('Test Accuracy of the model on the 10000 test images: %.2f' % accuracy)
-
-
-################################################
 # Main
 ################################################
 
-train(num_epochs, cnn, loaders)
-test()
 
-# => Test Accuracy of the model on the 10000 test images: 0.99
+cnn = CNN().to(device)
+print(cnn)
+loss_func = nn.CrossEntropyLoss()
+optimizer = optim.Adam(cnn.parameters(), lr=0.01)
+num_epochs = 10
+train(num_epochs, cnn, train_loader)
+cnn.save('model.pth')
 
 ################################################
