@@ -108,5 +108,72 @@ class CNN(nn.Module):
         return output, x    # return x for visualization
 
 
-model = CNN().to(device)
-print(model)
+################################################
+# Training the model
+################################################
+
+cnn = CNN().to(device)
+print(cnn)
+loss_func = nn.CrossEntropyLoss()
+optimizer = optim.Adam(cnn.parameters(), lr=0.01)
+
+num_epochs = 10
+
+
+def train(num_epochs, cnn, loaders):
+
+    cnn.train()
+
+    # Train the model
+    total_step = len(loaders['train'])
+
+    for epoch in range(num_epochs):
+        for i, (images, labels) in enumerate(loaders['train']):
+
+            # gives batch data, normalize x when iterate train_loader
+            b_x = images   # batch x
+            b_y = labels   # batch y
+            output = cnn(b_x)[0]
+            loss = loss_func(output, b_y)
+
+            # clear gradients for this training step
+            optimizer.zero_grad()
+
+            # backpropagation, compute gradients
+            loss.backward()
+            # apply gradients
+            optimizer.step()
+
+            if (i+1) % 100 == 0:
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+                      .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
+
+################################################
+# Testing the model
+################################################
+
+
+def test():
+    # Test the model
+    cnn.eval()
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for images, labels in loaders['test']:
+            test_output, last_layer = cnn(images)
+            pred_y = torch.max(test_output, 1)[1].data.squeeze()
+            accuracy = (pred_y == labels).sum().item() / float(labels.size(0))
+
+    print('Test Accuracy of the model on the 10000 test images: %.2f' % accuracy)
+
+
+################################################
+# Main
+################################################
+
+train(num_epochs, cnn, loaders)
+test()
+
+# => Test Accuracy of the model on the 10000 test images: 0.99
+
+################################################
