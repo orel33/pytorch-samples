@@ -22,6 +22,7 @@ DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 # numpy.ndarray (H x W x C) in the range [0, 255] to a torch.FloatTensor of
 # shape (C x H x W) in the range [0.0, 1.0].
 # https://pytorch.org/vision/main/generated/torchvision.transforms.ToTensor.html
+# C: color channels (in our case, C=1 because we have grayscale images)
 
 # get and format the training set
 train_dataset = torchvision.datasets.MNIST(
