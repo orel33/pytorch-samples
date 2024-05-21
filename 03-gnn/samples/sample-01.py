@@ -33,5 +33,24 @@ print(f'Is undirected: {data.is_undirected()}')
 
 print()
 print('===========================================================================================================')
-print(data.train_mask)
-print(data.test_mask)
+print("train mask:", data.train_mask, data.train_mask.sum())
+print("test mask:", data.test_mask, data.test_mask.sum())
+print("val mask:", data.val_mask, data.val_mask.sum())
+
+print()
+print('===========================================================================================================')
+print("label y:", data.y, "min:", data.y.min().item(), "max:", data.y.max().item())
+print("features x:", data.x.shape)
+
+# loop over the edges in the graph
+
+train_halo = []
+for i in range(data.num_edges):
+    # src, dst = data.edge_index[:, i]
+    src = data.edge_index[0, i]
+    dst = data.edge_index[1, i]
+    # print(f'Edge {i}: {src.item()} -> {dst.item()}')
+    if data.train_mask[src] and not data.train_mask[dst]:
+        train_halo.append(dst.item())
+
+print("halo size:", len(train_halo))

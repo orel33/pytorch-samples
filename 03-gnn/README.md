@@ -19,7 +19,3 @@ $ python3 -c "import torch; print(torch.__version__)"
 ## Example
 
 <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html>
-
-
-
-

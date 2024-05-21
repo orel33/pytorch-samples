@@ -58,7 +58,7 @@ class MLP(torch.nn.Module):
 
 
 # GCN model
-# FIXME: GCN model is not working (need to update MLP model to use data.x instead of x)
+# https: // pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GCNConv.html
 class GCN(torch.nn.Module):
     def __init__(self, hidden_channels):
         super().__init__()
@@ -77,8 +77,8 @@ class GCN(torch.nn.Module):
 
 
 # create model
-model = MLP(hidden_channels=16)
-# model = GCN(hidden_channels=16)
+# model = MLP(hidden_channels=16)
+model = GCN(hidden_channels=16)
 print(model)
 
 # summary

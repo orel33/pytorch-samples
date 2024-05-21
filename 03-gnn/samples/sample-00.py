@@ -19,3 +19,12 @@ print(f'Average node degree: {data.num_edges / data.num_nodes:.2f}')
 print(f'Has isolated nodes: {data.has_isolated_nodes()}')
 print(f'Has self-loops: {data.has_self_loops()}')
 print(f'Is undirected: {data.is_undirected()}')
+
+
+# loop over the edges in the graph
+
+for i in range(data.num_edges):
+    # src, dst = data.edge_index[:, i]
+    src = data.edge_index[0, i]
+    dst = data.edge_index[1, i]
+    print(f'Edge {i}: {src.item()} -> {dst.item()}')

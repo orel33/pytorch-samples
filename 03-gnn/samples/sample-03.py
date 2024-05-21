@@ -1,3 +1,4 @@
+# visualize the CORA dataset (train set, validation set, test set)
 
 from torch_geometric.transforms import NormalizeFeatures
 from torch_geometric.datasets import Planetoid
@@ -35,6 +36,19 @@ dataset = Planetoid(root='data/Planetoid', name='Cora',
                     transform=NormalizeFeatures())
 data = dataset[0]  # Get the first graph object.
 
-visualize(data.x, color=data.y, title='Space Embedding of CORA dataset')
+
+color = torch.zeros_like(data.y)
+color[data.train_mask] = 1
+color[data.val_mask] = 2
+color[data.test_mask] = 3
+
+
+print(f'Number of nodes: {data.num_nodes}')
+print(f'Number of edges: {data.num_edges}')
+print(f'Number of features: {data.num_features}')
+print(f'Number of classes: {dataset.num_classes}')
+
+
+visualize(data.x, color, title='CORA dataset')
 
 # EOF
