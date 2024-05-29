@@ -8,8 +8,12 @@ x = torch.tensor([[-1], [0], [1]], dtype=torch.float)
 
 data = Data(x=x, edge_index=edge_index)
 
+
 print()
-print(data)
+print("data:", data)
+print("edge index:", data.edge_index)
+print("node features x:", data.x)
+
 print('===================================')
 
 # Gather some statistics about the graph.
