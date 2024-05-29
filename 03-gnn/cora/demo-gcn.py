@@ -2,27 +2,47 @@
 # graph node classification
 # GCN model vs MLP model
 
+from torch_geometric.utils import degree
 import matplotlib.pyplot as plt
 from torch_geometric.nn import GCNConv
+from torch_geometric.nn import SAGEConv
+from torch_geometric.nn import GATConv
 import torch.nn.functional as F
 from torch.nn import Linear
 from torch_geometric.transforms import NormalizeFeatures
 from torch_geometric.datasets import Planetoid
 from torch_geometric.data import Data
+import sys
 import os
 import numpy as np
 import torch
 os.environ['TORCH'] = torch.__version__
 print(torch.__version__)
 
-
-EPOCHS = 200
+EPOCHS = 300
 
 # load CORA dataset
-dataset = Planetoid(root='data/Planetoid', name='Cora',
-                    transform=NormalizeFeatures())
+dataset = Planetoid(root='data/Planetoid', name='Cora')
+# transform=NormalizeFeatures())
 
 data = dataset[0]  # Get the first graph object (the only one in this dataset).
+
+# try to aggregate node features from neighbors (for MLP model)
+# deg = degree(data.edge_index[0], data.num_nodes)
+# data.x0 = data.x.clone()
+# data.x.zero_()
+# for i in range(data.num_edges):
+#     src = data.edge_index[0, i]
+#     dst = data.edge_index[1, i]
+#     data.x[src] += data.x0[dst]
+
+# for i in range(data.num_nodes):
+#     data.x[i] = data.x0[i] + data.x[i] / deg[i]
+
+NormalizeFeatures()(data)
+# print(data.x[0, :1000])
+# print(data.x[0, :30])
+# sys.exit(0)
 
 # plot
 
@@ -58,13 +78,17 @@ class MLP(torch.nn.Module):
 
 
 # GCN model
-# https: // pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GCNConv.html
+# https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GCNConv.html
 class GCN(torch.nn.Module):
     def __init__(self, hidden_channels):
         super().__init__()
         torch.manual_seed(12345)
         self.conv1 = GCNConv(dataset.num_node_features, hidden_channels)
         self.conv2 = GCNConv(hidden_channels, dataset.num_classes)
+        # self.conv1 = SAGEConv(dataset.num_node_features, hidden_channels)
+        # self.conv2 = SAGEConv(hidden_channels, dataset.num_classes)
+        # self.conv1 = GATConv(dataset.num_node_features, hidden_channels)
+        # self.conv2 = GATConv(hidden_channels, dataset.num_classes)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
@@ -101,9 +125,9 @@ def train():
     loss = criterion(out[data.train_mask], data.y[data.train_mask])
     loss.backward()         # Derive gradients.
     optimizer.step()        # Update parameters based on gradients.
-    _loss = loss.item()     # Derive Python number from loss tensor.
-    print(f"Loss: {_loss:.4f}")
-    return _loss
+    lossval = loss.item()     # Derive Python number from loss tensor.
+    print(f"Loss: {lossval:.4f}")
+    return lossval
 
 
 def test():
