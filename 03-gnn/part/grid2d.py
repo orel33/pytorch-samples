@@ -21,5 +21,5 @@ def make_grid2d(height, width):
 
 
 data = make_grid2d(3, 3)
-# print(data.edge_index)
 print(data)
+print(data.edge_index)
