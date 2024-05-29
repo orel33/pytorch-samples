@@ -1,4 +1,5 @@
 ################## CORA dataset ##################
+# => https://medium.com/@koki_noda/ultimate-guide-to-graph-neural-networks-1-cora-dataset-37338c04fe6f
 
 from torch_geometric.datasets import Planetoid
 from torch_geometric.transforms import NormalizeFeatures
@@ -41,6 +42,13 @@ print()
 print('===========================================================================================================')
 print("label y:", data.y, "min:", data.y.min().item(), "max:", data.y.max().item())
 print("features x:", data.x.shape)
+
+
+deg = degree(data.edge_index[0], data.num_nodes)
+deg[0]  # degree of node 0
+print(f"Degree of node 0: {deg[0]}"
+      f"\nMin degree: {deg.min().item()}"
+      f"\nMax degree: {deg.max().item()}")
 
 # loop over the edges in the graph
 
