@@ -6,6 +6,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 
+
+def grid_layout(g):
+    pos = {}
+    for node in G.nodes():
+        pos[node] = [node[0], node[1]]
+    # print("pos:", pos)
+    return pos
+
+
 G = nx.grid_graph(dim=(3, 4))
 print("nodes:", G.nodes())  # hashable items
 
@@ -20,17 +29,11 @@ print("part 1:", lparts[1])
 
 # Plot the graph
 # pos = nx.spring_layout(G)
-pos = {}
-for node in G.nodes():
-    pos[node] = [node[0], node[1]]
-print("pos:", pos)
+# pos = nx.spectral_layout(G)
+pos = grid_layout(G)
 
-# xparts = {}
-# for i, part in enumerate(lparts):
-#     for node in part:
-#         xparts[node] = i
-# print("xparts:", xparts)
 
+# compute colors
 color = np.array(['r', 'b'])
 parts = []
 for node in G.nodes():
