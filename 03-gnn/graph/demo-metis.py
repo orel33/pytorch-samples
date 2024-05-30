@@ -13,10 +13,10 @@ G.add_edge(1, 3)
 G.add_edge(2, 3)
 
 # Partition the graph
-(edgecuts, parts) = metis.part_graph(G, 2)
+(edgecut, parts) = metis.part_graph(G, 2)
 
 # Print the edgecuts
-print(edgecuts)
+print(edgecut)
 
 # Print the parts
 print(parts)
@@ -24,5 +24,8 @@ print(parts)
 # Plot the graph
 pos = nx.spring_layout(G)
 color = np.array(['r', 'b'])
+# print(color, type(color))
+# node_color = color[parts]
+# print(node_color, type(node_color))
 nx.draw(G, pos, node_color=color[parts], with_labels=True)
 plt.show()
