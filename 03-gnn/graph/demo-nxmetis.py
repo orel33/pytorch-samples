@@ -32,16 +32,14 @@ print("part 1:", lparts[1])
 # pos = nx.spectral_layout(G)
 pos = grid_layout(G)
 
+dictpart = {}
+for p, nodes in enumerate(lparts):
+    for n in nodes:
+        dictpart[n] = p
 
-# compute colors
-color = np.array(['r', 'b'])
-parts = []
-for node in G.nodes():
-    if node in lparts[0]:
-        parts.append(0)
-    else:
-        parts.append(1)
-
+parts = [dictpart[n] for n in G.nodes()]
 print(parts)
-nx.draw(G, pos, node_color=color[parts], with_labels=True)
+
+colors = np.array(['red', 'blue', 'green'])
+nx.draw(G, pos, node_color=colors[parts], with_labels=True)
 plt.show()
