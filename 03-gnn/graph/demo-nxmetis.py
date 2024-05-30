@@ -10,12 +10,15 @@ import networkx as nx
 def grid_layout(g):
     pos = {}
     for node in G.nodes():
-        pos[node] = [node[0], node[1]]
+        pos[node] = [node[1], node[0]]  # coord x, coord y
     # print("pos:", pos)
     return pos
 
 
-G = nx.grid_graph(dim=(3, 4))
+nrows = 3
+ncols = 4
+# WARNING: the grid dimension are swapped!
+G = nx.grid_graph(dim=(ncols, nrows))
 print("nodes:", G.nodes())  # hashable items
 
 edgecut, lparts = nxmetis.partition(G, 2)
