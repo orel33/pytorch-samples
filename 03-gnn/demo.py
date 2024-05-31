@@ -14,8 +14,7 @@ from torch_geometric.data import Data
 from torch_geometric.loader import DataLoader
 from torch_geometric.nn import SAGEConv
 from torch_geometric.utils import degree
-# import torch.nn.functional as F
-# from torch.nn import Linear
+import matplotlib.pyplot as plt
 
 # Cpu by default
 device = 'cpu'
@@ -25,6 +24,25 @@ print('')
 
 # Seeds
 torch.manual_seed(12345)
+
+######################## Grid Plot ########################
+
+
+def grid_layout(g):
+    pos = {}
+    for node in g.nodes():
+        pos[node] = [node[1], node[0]]  # coord x (col), coord y (row)
+    return pos
+
+
+def grid_plot(nrows, ncols, part):
+    g = nx.grid_graph(dim=(ncols, nrows))  # networkx graph
+    # pos = nx.spring_layout(g)
+    pos = grid_layout(g)
+    colors = np.array(['red', 'blue'])
+    nx.draw(g, pos, node_color=colors[part], with_labels=True)
+    plt.show()
+
 
 ######################## Data ########################
 
@@ -123,6 +141,8 @@ epochs = 1000  # epochs
 print_loss = 100  # steps after which the loss function is printed
 losses = []
 
+
+# epochs = 0
 # Training loop
 print('Start training')
 for i in range(epochs):
@@ -140,3 +160,19 @@ for i in range(epochs):
 
 print('End training')
 print('')
+
+# Test the model
+nrows = ncols = 8
+gg = grid_graph(nrows, ncols)
+gg = gg.to(device)
+print('Grid Graph', nrows, 'x', ncols)
+print(gg)
+data = model(gg)
+part = torch.argmax(data, dim=1)
+print('Model output:', data)
+print('Partition:', part)
+print('Loss:', loss_fn(data, gg).item())
+print('')
+
+# Plot output
+grid_plot(nrows, ncols, part)

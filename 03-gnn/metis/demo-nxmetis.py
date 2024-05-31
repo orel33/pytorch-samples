@@ -9,7 +9,7 @@ import networkx as nx
 
 def grid_layout(g):
     pos = {}
-    for node in G.nodes():
+    for node in g.nodes():
         pos[node] = [node[1], node[0]]  # coord x, coord y
     # print("pos:", pos)
     return pos

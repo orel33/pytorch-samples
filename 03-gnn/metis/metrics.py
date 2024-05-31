@@ -15,5 +15,14 @@ def normalized_cut_metis(g):
     degB = sum(g.degree(n) for n in parts[1])
     return cut * (1 / degA + 1 / degB), t1, degA, degB, cut
 
+# Returns the cut of the partitioning of the pytorch geometric graph
+
+
+def cut(graph):
+    cut = torch.sum((graph.x[graph.edge_index[0],
+                             :2] != graph.x[graph.edge_index[1],
+                                            :2]).all(axis=-1)).detach().item() / 2
+    return cut
+
 
 # TODO: try it
