@@ -3,7 +3,7 @@
 import torch
 import numpy as np
 
-# initialize a tensor directly from data
+# initialize a tensor directly from data (python list)
 data = [[1, 2], [3, 4]]
 x_data = torch.tensor(data)
 
